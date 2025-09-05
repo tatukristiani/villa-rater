@@ -5,6 +5,7 @@ import { useStore } from "../store/store";
 import { nanoid } from "nanoid";
 import type { Villa, VillaFilters } from "../types";
 
+// Create a new group and select villas based on filters
 export default function CreateGroup() {
   const navigate = useNavigate();
   const { user } = useStore();
