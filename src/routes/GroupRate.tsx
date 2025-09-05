@@ -11,14 +11,13 @@ import type {
   Villa,
   VillaImage,
   VillaDateOption,
-  Rating,
   GroupProgress,
 } from "../types";
 
 export default function GroupRate() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { user, currentGroup } = useStore();
+  const { user } = useStore();
 
   const [villa, setVilla] = useState<Villa | null>(null);
   const [images, setImages] = useState<VillaImage[]>([]);

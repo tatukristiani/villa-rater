@@ -1,5 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
+// Environment variables are available via import.meta.env in Vite projects.
+
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 

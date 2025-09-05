@@ -70,7 +70,7 @@ export default function MemberListLive({
       <div className="space-y-2">
         {members.map((member) => (
           <div
-            key={member.userId}
+            key={member.user_id}
             className="flex items-center gap-2 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg"
           >
             <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-medium">
@@ -78,7 +78,7 @@ export default function MemberListLive({
             </div>
             <span className="font-medium">{member.username}</span>
             <span className="ml-auto text-xs text-gray-500 dark:text-gray-400">
-              Joined {new Date(member.joinedAt).toLocaleTimeString()}
+              Joined {new Date(member.joined_at).toLocaleTimeString()}
             </span>
           </div>
         ))}

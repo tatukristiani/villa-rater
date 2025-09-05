@@ -25,9 +25,9 @@ export default function DateSelector({
   return (
     <div className="space-y-2">
       {options.map((option) => {
-        const startDate = new Date(option.startDate);
-        const endDate = new Date(option.endDate);
-        const price = (option.priceCents / 100).toFixed(2);
+        const startDate = new Date(option.start_date);
+        const endDate = new Date(option.end_date);
+        const price = (option.price_cents / 100).toFixed(2);
         const isSelected = value === option.id;
 
         return (
