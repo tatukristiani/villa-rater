@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { supabase, signInAnonymously, createProfile } from "../lib/supabase";
-import type { User, Group, GroupMember, Rating } from "../types";
+import type { User, Group, GroupMember } from "../types";
 
 interface Store {
   user: User | null;
@@ -54,7 +54,7 @@ export const useStore = create<Store>((set, get) => ({
 
   login: async (username: string) => {
     try {
-      const { user, session } = await signInAnonymously();
+      const { user } = await signInAnonymously();
       if (!user) throw new Error("Failed to create anonymous session");
 
       const profile = await createProfile(user.id, username);
