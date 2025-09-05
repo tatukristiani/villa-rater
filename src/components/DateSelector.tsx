@@ -8,6 +8,7 @@ interface DateSelectorProps {
   disabled?: boolean;
 }
 
+// Component to select a date option for a villa
 export default function DateSelector({
   options,
   value,
