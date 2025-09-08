@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Profile } from "../../types";
 import { getInitials } from "../../utils/helpers";
 
@@ -6,7 +6,6 @@ interface GroupLobbyPageProps {
   groupName: string;
   joinCode: string;
   members: Profile[];
-  isCreator: boolean;
   currentUserId: string;
   onLeave: () => void;
   onStart: () => void;
@@ -16,11 +15,15 @@ export const GroupLobbyPage: React.FC<GroupLobbyPageProps> = ({
   groupName,
   joinCode,
   members,
-  isCreator,
   currentUserId,
   onLeave,
   onStart,
 }) => {
+  const [membersList, setMembersList] = React.useState<Profile[]>(members);
+
+  useEffect(() => {
+    setMembersList(members);
+  }, [members]);
   return (
     <>
       <button
@@ -51,10 +54,10 @@ export const GroupLobbyPage: React.FC<GroupLobbyPageProps> = ({
 
       <div className="glass-card" style={{ marginBottom: "15px" }}>
         <h4 style={{ color: "var(--primary-gold)", marginBottom: "20px" }}>
-          <i className="bi bi-people-fill"></i> Members ({members.length})
+          <i className="bi bi-people-fill"></i> Members ({membersList.length})
         </h4>
         <div>
-          {members.map((member) => (
+          {membersList.map((member) => (
             <div key={member.id} className="member-item">
               <div className="member-avatar">
                 {getInitials(member.username)}
