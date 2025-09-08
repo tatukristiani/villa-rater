@@ -364,7 +364,6 @@ function App() {
               groupName={state.currentGroup.name}
               joinCode={state.currentGroup.join_code}
               members={state.members}
-              isCreator={state.isCreator}
               currentUserId={state.currentUser.id}
               onLeave={() => navigate("home")}
               onStart={handleStartRating}
