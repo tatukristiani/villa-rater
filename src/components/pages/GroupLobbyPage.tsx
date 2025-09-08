@@ -96,6 +96,9 @@ export const GroupLobbyPage: React.FC<GroupLobbyPageProps> = ({
         <h4 style={{ color: "var(--primary-gold)", marginBottom: "20px" }}>
           <i className="bi bi-people-fill"></i> Members ({members.length})
         </h4>
+        <button className="btn-luxury" onClick={loadMembers}>
+          <i className="bi bi-play-fill"></i> Refresh Members
+        </button>
         <div>
           {members.map((member) => (
             <div key={member.id} className="member-item">
@@ -109,19 +112,38 @@ export const GroupLobbyPage: React.FC<GroupLobbyPageProps> = ({
                 {member.id === currentUserId && (
                   <small style={{ color: "var(--primary-gold)" }}>You</small>
                 )}
+                {isCreator && member.id === currentUserId && (
+                  <small style={{ color: "var(--primary-gold)" }}>
+                    {" "}
+                    (Host)
+                  </small>
+                )}
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {isCreator && (
-        <div className="glass-card">
-          <button className="btn-luxury" onClick={onStart}>
-            <i className="bi bi-play-fill"></i> Start Rating
-          </button>
-        </div>
-      )}
+      <div className="glass-card">
+        <button className="btn-luxury" onClick={onStart}>
+          <i className="bi bi-play-fill"></i> Start Rating
+        </button>
+
+        <p
+          style={{
+            textAlign: "center",
+
+            marginTop: "15px",
+
+            color: "var(--text-muted)",
+
+            fontSize: "14px",
+          }}
+        >
+          <i className="bi bi-info-circle"></i> Start when you're ready. You'll
+          wait for others at the end.
+        </p>
+      </div>
     </>
   );
 };

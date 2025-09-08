@@ -227,11 +227,18 @@ function App() {
   const handleStartRating = async () => {
     if (!state.currentGroup) return;
 
-    await supabase
-      .from("groups")
-      .update({ status: "rating" })
-      .eq("id", state.currentGroup.id);
+    // No need to update group status - each user starts independently
+    setState((prev) => ({
+      ...prev,
+      currentVillaIndex: 0,
+      ratings: {},
+      hasRatedCurrent: false,
+      currentPage: "rating",
+    }));
+    showToast("Rating Started", "Begin rating villas");
+  };
 
+  const handleAutoStartRating = () => {
     setState((prev) => ({
       ...prev,
       currentVillaIndex: 0,
@@ -277,46 +284,8 @@ function App() {
 
   const showResults = async () => {
     if (!state.currentGroup) return;
-
-    const { data: ratings } = await supabase
-      .from("ratings")
-      .select("*, profiles!ratings_user_id_fkey(username)")
-      .eq("group_id", state.currentGroup.id);
-
-    // Calculate average ratings and collect individual ratings
-    const villaRatings: Record<
-      string,
-      { ratings: number[]; userRatings: any[] }
-    > = {};
-
-    ratings?.forEach((r) => {
-      if (!villaRatings[r.villa_id]) {
-        villaRatings[r.villa_id] = { ratings: [], userRatings: [] };
-      }
-      villaRatings[r.villa_id].ratings.push(r.stars);
-      villaRatings[r.villa_id].userRatings.push({
-        userId: r.user_id,
-        username: (r as any).profiles?.username || "Unknown",
-        rating: r.stars,
-      });
-    });
-
-    const villasWithRatings = state.villas.map((villa) => ({
-      ...villa,
-      avgRating: villaRatings[villa.id]
-        ? villaRatings[villa.id].ratings.reduce((a, b) => a + b, 0) /
-          villaRatings[villa.id].ratings.length
-        : 0,
-      userRatings: villaRatings[villa.id]?.userRatings || [],
-    }));
-
-    villasWithRatings.sort((a, b) => b.avgRating - a.avgRating);
-
-    setState((prev) => ({
-      ...prev,
-      villas: villasWithRatings,
-      currentPage: "results",
-    }));
+    await refreshResults(); // Just call the refresh function
+    setState((prev) => ({ ...prev, currentPage: "results" }));
   };
 
   const handleLogout = async () => {
@@ -338,6 +307,84 @@ function App() {
 
   const navigate = (page: Page) => {
     setState((prev) => ({ ...prev, currentPage: page }));
+  };
+
+  const refreshResults = async () => {
+    if (!state.currentGroup) return;
+
+    try {
+      // Reload all members first
+      const { data: memberData } = await supabase
+        .from("group_members")
+        .select("profiles(*)")
+        .eq("group_id", state.currentGroup.id);
+
+      const members =
+        memberData?.map((m) => (m as any).profiles).filter(Boolean) || [];
+
+      // Get all ratings with profile information
+      const { data: ratings } = await supabase
+        .from("ratings")
+        .select(
+          `
+        *,
+        profiles:user_id (
+          id,
+          username
+        )
+      `
+        )
+        .eq("group_id", state.currentGroup.id);
+
+      // Calculate average ratings and collect individual ratings
+      const villaRatings: Record<
+        string,
+        { ratings: number[]; userRatings: any[] }
+      > = {};
+
+      ratings?.forEach((r) => {
+        if (!villaRatings[r.villa_id]) {
+          villaRatings[r.villa_id] = { ratings: [], userRatings: [] };
+        }
+        villaRatings[r.villa_id].ratings.push(r.stars);
+
+        // Get the profile data properly
+        const profile = (r as any).profiles;
+        villaRatings[r.villa_id].userRatings.push({
+          userId: r.user_id,
+          username: profile?.username || "Unknown",
+          rating: r.stars,
+        });
+      });
+
+      // Load fresh villa data
+      const { data: freshVillas } = await supabase
+        .from("villas")
+        .select("*")
+        .order("created_at");
+
+      const villasWithRatings = (freshVillas || state.villas).map((villa) => ({
+        ...villa,
+        avgRating: villaRatings[villa.id]
+          ? villaRatings[villa.id].ratings.reduce((a, b) => a + b, 0) /
+            villaRatings[villa.id].ratings.length
+          : 0,
+        userRatings: villaRatings[villa.id]?.userRatings || [],
+      }));
+
+      villasWithRatings.sort((a, b) => b.avgRating - a.avgRating);
+
+      setState((prev) => ({
+        ...prev,
+        villas: villasWithRatings,
+        members: members,
+      }));
+
+      showToast("Refreshed", "Ratings updated successfully");
+    } catch (error) {
+      console.error("Error refreshing results:", error);
+      showToast("Error", "Failed to refresh ratings", "error");
+    }
   };
 
   return (
@@ -370,14 +417,14 @@ function App() {
           state.currentGroup &&
           state.currentUser && (
             <GroupLobbyPage
-              groupId={state.currentGroup.id} // Add this
+              groupId={state.currentGroup.id}
               groupName={state.currentGroup.name}
               joinCode={state.currentGroup.join_code}
               members={state.members}
-              isCreator={state.isCreator} // Add this
+              isCreator={state.isCreator}
               currentUserId={state.currentUser.id}
               onLeave={() => navigate("home")}
-              onStart={handleStartRating}
+              onStart={handleStartRating} // No onAutoStart needed
             />
           )}
         {state.currentPage === "rating" &&
@@ -407,6 +454,7 @@ function App() {
             villas={state.villas as any}
             onHome={() => navigate("home")}
             onViewVilla={handleViewVilla}
+            onRefresh={refreshResults} // Add this prop
           />
         )}
         {state.currentPage === "villaView" && state.selectedVilla && (
