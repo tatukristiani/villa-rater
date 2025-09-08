@@ -238,17 +238,6 @@ function App() {
     showToast("Rating Started", "Begin rating villas");
   };
 
-  const handleAutoStartRating = () => {
-    setState((prev) => ({
-      ...prev,
-      currentVillaIndex: 0,
-      ratings: {},
-      hasRatedCurrent: false,
-      currentPage: "rating",
-    }));
-    showToast("Rating Started", "Begin rating villas");
-  };
-
   const handleSaveRating = async (rating: number) => {
     if (!state.currentUser || !state.currentGroup) return;
 
