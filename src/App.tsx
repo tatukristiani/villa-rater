@@ -265,10 +265,7 @@ function App() {
   const handleNextVilla = () => {
     if (state.currentVillaIndex >= state.villas.length - 1) {
       setState((prev) => ({ ...prev, currentPage: "waiting" }));
-      // Simulate waiting then show results
-      setTimeout(() => {
-        showResults();
-      }, 3000);
+      // Don't auto-proceed, let WaitingPage handle it
     } else {
       setState((prev) => ({
         ...prev,
@@ -283,22 +280,34 @@ function App() {
 
     const { data: ratings } = await supabase
       .from("ratings")
-      .select("*")
+      .select("*, profiles!ratings_user_id_fkey(username)")
       .eq("group_id", state.currentGroup.id);
 
-    // Calculate average ratings
-    const villaRatings: Record<string, number[]> = {};
+    // Calculate average ratings and collect individual ratings
+    const villaRatings: Record<
+      string,
+      { ratings: number[]; userRatings: any[] }
+    > = {};
+
     ratings?.forEach((r) => {
-      if (!villaRatings[r.villa_id]) villaRatings[r.villa_id] = [];
-      villaRatings[r.villa_id].push(r.stars);
+      if (!villaRatings[r.villa_id]) {
+        villaRatings[r.villa_id] = { ratings: [], userRatings: [] };
+      }
+      villaRatings[r.villa_id].ratings.push(r.stars);
+      villaRatings[r.villa_id].userRatings.push({
+        userId: r.user_id,
+        username: (r as any).profiles?.username || "Unknown",
+        rating: r.stars,
+      });
     });
 
     const villasWithRatings = state.villas.map((villa) => ({
       ...villa,
       avgRating: villaRatings[villa.id]
-        ? villaRatings[villa.id].reduce((a, b) => a + b, 0) /
-          villaRatings[villa.id].length
+        ? villaRatings[villa.id].ratings.reduce((a, b) => a + b, 0) /
+          villaRatings[villa.id].ratings.length
         : 0,
+      userRatings: villaRatings[villa.id]?.userRatings || [],
     }));
 
     villasWithRatings.sort((a, b) => b.avgRating - a.avgRating);
@@ -361,9 +370,11 @@ function App() {
           state.currentGroup &&
           state.currentUser && (
             <GroupLobbyPage
+              groupId={state.currentGroup.id} // Add this
               groupName={state.currentGroup.name}
               joinCode={state.currentGroup.join_code}
               members={state.members}
+              isCreator={state.isCreator} // Add this
               currentUserId={state.currentUser.id}
               onLeave={() => navigate("home")}
               onStart={handleStartRating}
@@ -380,9 +391,17 @@ function App() {
               hasRated={state.hasRatedCurrent}
             />
           )}
-        {state.currentPage === "waiting" && (
-          <WaitingPage finishedCount={1} totalMembers={state.members.length} />
-        )}
+        {state.currentPage === "waiting" &&
+          state.currentGroup &&
+          state.currentUser && (
+            <WaitingPage
+              groupId={state.currentGroup.id}
+              totalVillas={state.villas.length}
+              totalMembers={state.members.length}
+              currentUserId={state.currentUser.id}
+              onComplete={showResults}
+            />
+          )}
         {state.currentPage === "results" && (
           <ResultsPage
             villas={state.villas as any}

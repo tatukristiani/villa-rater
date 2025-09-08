@@ -1,29 +1,69 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Profile } from "../../types";
 import { getInitials } from "../../utils/helpers";
+import { supabase } from "../../lib/supabase";
 
 interface GroupLobbyPageProps {
+  groupId: string; // Add this prop
   groupName: string;
   joinCode: string;
   members: Profile[];
+  isCreator: boolean; // Add this prop
   currentUserId: string;
   onLeave: () => void;
   onStart: () => void;
 }
 
 export const GroupLobbyPage: React.FC<GroupLobbyPageProps> = ({
+  groupId,
   groupName,
   joinCode,
-  members,
+  members: initialMembers,
+  isCreator,
   currentUserId,
   onLeave,
   onStart,
 }) => {
-  const [membersList, setMembersList] = React.useState<Profile[]>(members);
+  const [members, setMembers] = useState<Profile[]>(initialMembers);
 
   useEffect(() => {
-    setMembersList(members);
-  }, [members]);
+    // Load initial members
+    loadMembers();
+
+    // Subscribe to real-time changes
+    const channel = supabase
+      .channel(`group-${groupId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "group_members",
+          filter: `group_id=eq.${groupId}`,
+        },
+        () => {
+          // Reload members when someone new joins
+          loadMembers();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [groupId]);
+
+  const loadMembers = async () => {
+    const { data: memberData } = await supabase
+      .from("group_members")
+      .select("profiles(*)")
+      .eq("group_id", groupId);
+
+    const membersList =
+      memberData?.map((m) => (m as any).profiles).filter(Boolean) || [];
+    setMembers(membersList);
+  };
+
   return (
     <>
       <button
@@ -54,10 +94,10 @@ export const GroupLobbyPage: React.FC<GroupLobbyPageProps> = ({
 
       <div className="glass-card" style={{ marginBottom: "15px" }}>
         <h4 style={{ color: "var(--primary-gold)", marginBottom: "20px" }}>
-          <i className="bi bi-people-fill"></i> Members ({membersList.length})
+          <i className="bi bi-people-fill"></i> Members ({members.length})
         </h4>
         <div>
-          {membersList.map((member) => (
+          {members.map((member) => (
             <div key={member.id} className="member-item">
               <div className="member-avatar">
                 {getInitials(member.username)}
@@ -74,11 +114,14 @@ export const GroupLobbyPage: React.FC<GroupLobbyPageProps> = ({
           ))}
         </div>
       </div>
-      <div className="glass-card">
-        <button className="btn-luxury" onClick={onStart}>
-          <i className="bi bi-play-fill"></i> Start Rating
-        </button>
-      </div>
+
+      {isCreator && (
+        <div className="glass-card">
+          <button className="btn-luxury" onClick={onStart}>
+            <i className="bi bi-play-fill"></i> Start Rating
+          </button>
+        </div>
+      )}
     </>
   );
 };
