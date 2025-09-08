@@ -71,14 +71,11 @@ export const GroupLobbyPage: React.FC<GroupLobbyPageProps> = ({
           ))}
         </div>
       </div>
-
-      {isCreator && (
-        <div className="glass-card">
-          <button className="btn-luxury" onClick={onStart}>
-            <i className="bi bi-play-fill"></i> Start Rating
-          </button>
-        </div>
-      )}
+      <div className="glass-card">
+        <button className="btn-luxury" onClick={onStart}>
+          <i className="bi bi-play-fill"></i> Start Rating
+        </button>
+      </div>
     </>
   );
 };
