@@ -1,7 +1,7 @@
 import React from "react";
-import { Villa } from "../../types";
-import { formatPrice } from "../../utils/helpers";
+import { Villa } from "../../types/types";
 import { ImageCarousel } from "../ImageCarousel";
+import { DateRangeDisplay } from "../DateRangeDisplay";
 
 interface VillaViewPageProps {
   villa: Villa & { avgRating?: number };
@@ -50,7 +50,7 @@ export const VillaViewPage: React.FC<VillaViewPageProps> = ({
           )}
         </div>
 
-        {/* Replace single image with carousel */}
+        {/* Image carousel */}
         <ImageCarousel images={villa.images} alt={villa.title} height="300px" />
 
         {/* Location Information */}
@@ -68,7 +68,7 @@ export const VillaViewPage: React.FC<VillaViewPageProps> = ({
               display: "flex",
               alignItems: "center",
               gap: "10px",
-              marginBottom: "10px",
+              marginBottom: villa.address ? "10px" : 0,
             }}
           >
             <i
@@ -79,94 +79,42 @@ export const VillaViewPage: React.FC<VillaViewPageProps> = ({
               {villa.city}, {villa.country}
             </span>
           </div>
-          <div
-            style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}
-          >
-            <i
-              className="bi bi-map"
-              style={{
-                color: "var(--text-muted)",
-                fontSize: "14px",
-                marginTop: "2px",
-              }}
-            ></i>
-            <span style={{ color: "var(--text-muted)", fontSize: "14px" }}>
-              {villa.address}
-            </span>
-          </div>
+          {villa.address && (
+            <div
+              style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}
+            >
+              <i
+                className="bi bi-map"
+                style={{
+                  color: "var(--text-muted)",
+                  fontSize: "14px",
+                  marginTop: "2px",
+                }}
+              ></i>
+              <span style={{ color: "var(--text-muted)", fontSize: "14px" }}>
+                {villa.address}
+              </span>
+            </div>
+          )}
         </div>
 
-        {/* Price and Dates Grid */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: "15px",
-            marginBottom: "20px",
-          }}
-        >
-          <div
+        {/* Availability & Pricing Section */}
+        <div style={{ marginBottom: "20px" }}>
+          <h4
             style={{
-              background: "rgba(255, 255, 255, 0.05)",
-              padding: "15px",
-              borderRadius: "10px",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
+              color: "var(--primary-gold)",
+              marginBottom: "15px",
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                marginBottom: "5px",
-              }}
-            >
-              <i
-                className="bi bi-currency-euro"
-                style={{ color: "var(--primary-gold)" }}
-              ></i>
-              <small style={{ color: "var(--text-muted)" }}>
-                Price per week
-              </small>
-            </div>
-            <h3 style={{ color: "var(--primary-gold)", margin: 0 }}>
-              €{formatPrice(villa.price)}
-            </h3>
-          </div>
-
-          <div
-            style={{
-              background: "rgba(255, 255, 255, 0.05)",
-              padding: "15px",
-              borderRadius: "10px",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                marginBottom: "5px",
-              }}
-            >
-              <i
-                className="bi bi-calendar-check"
-                style={{ color: "var(--primary-gold)" }}
-              ></i>
-              <small style={{ color: "var(--text-muted)" }}>Available</small>
-            </div>
-            <p
-              style={{
-                color: "var(--text-light)",
-                margin: 0,
-                fontSize: "14px",
-              }}
-            >
-              {new Date(villa.start_date).toLocaleDateString()} -{" "}
-              {new Date(villa.end_date).toLocaleDateString()}
-            </p>
-          </div>
+            <i className="bi bi-calendar-check"></i> Availability & Pricing
+          </h4>
+          <DateRangeDisplay
+            dateRanges={villa.villa_date_ranges}
+            compact={false}
+          />
         </div>
 
         {/* Additional Information */}
@@ -183,27 +131,33 @@ export const VillaViewPage: React.FC<VillaViewPageProps> = ({
                 border: "1px solid rgba(255, 255, 255, 0.05)",
               }}
             >
-              {villa.additional_information.split(",").map((feature, index) => (
-                <div
-                  key={index}
-                  style={{
-                    display: "inline-block",
-                    background: "rgba(212, 175, 55, 0.1)",
-                    padding: "5px 12px",
-                    borderRadius: "20px",
-                    margin: "5px",
-                    border: "1px solid rgba(212, 175, 55, 0.2)",
-                    fontSize: "14px",
-                    color: "var(--text-light)",
-                  }}
-                >
-                  <i
-                    className="bi bi-check-circle"
-                    style={{ color: "var(--primary-gold)", marginRight: "5px" }}
-                  ></i>
-                  {feature.trim()}
-                </div>
-              ))}
+              {villa.additional_information
+                .split(/[,.]/)
+                .filter(Boolean)
+                .map((feature, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      display: "inline-block",
+                      background: "rgba(212, 175, 55, 0.1)",
+                      padding: "5px 12px",
+                      borderRadius: "20px",
+                      margin: "5px",
+                      border: "1px solid rgba(212, 175, 55, 0.2)",
+                      fontSize: "14px",
+                      color: "var(--text-light)",
+                    }}
+                  >
+                    <i
+                      className="bi bi-check-circle"
+                      style={{
+                        color: "var(--primary-gold)",
+                        marginRight: "5px",
+                      }}
+                    ></i>
+                    {feature.trim()}
+                  </div>
+                ))}
             </div>
           </div>
         )}
@@ -247,6 +201,7 @@ export const VillaViewPage: React.FC<VillaViewPageProps> = ({
           <button
             className="btn-luxury"
             onClick={() =>
+              villa.address &&
               window.open(
                 `https://www.google.com/maps/search/${encodeURIComponent(
                   villa.address
@@ -255,6 +210,7 @@ export const VillaViewPage: React.FC<VillaViewPageProps> = ({
               )
             }
             style={{ flex: 1 }}
+            disabled={!villa.address}
           >
             <i className="bi bi-map"></i> View on Map
           </button>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "./lib/supabase";
-import { Profile, Group, Villa } from "./types";
+import { Profile, Group, Villa } from "./types/types";
 import { generateJoinCode } from "./utils/helpers";
 import { Navigation } from "./components/Navigation";
 import { Toast } from "./components/Toast";
@@ -65,9 +65,15 @@ function App() {
   }, []);
 
   const loadVillas = async () => {
+    // Fetch villas with their date ranges
     const { data, error } = await supabase
       .from("villas")
-      .select("*")
+      .select(
+        `
+        *,
+        villa_date_ranges (*)
+      `
+      )
       .order("created_at");
 
     if (!error && data) {
@@ -346,10 +352,15 @@ function App() {
         });
       });
 
-      // Load fresh villa data
+      // Load fresh villa data with date ranges
       const { data: freshVillas } = await supabase
         .from("villas")
-        .select("*")
+        .select(
+          `
+          *,
+          villa_date_ranges (*)
+        `
+        )
         .order("created_at");
 
       const villasWithRatings = (freshVillas || state.villas).map((villa) => ({

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Profile } from "../../types";
+import { Profile } from "../../types/types";
 import { getInitials } from "../../utils/helpers";
 import { supabase } from "../../lib/supabase";
 

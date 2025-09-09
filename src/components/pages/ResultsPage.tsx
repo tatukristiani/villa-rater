@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { Villa } from "../../types";
-import { formatPrice, getInitials } from "../../utils/helpers";
+import { Villa } from "../../types/types";
+import { getInitials } from "../../utils/helpers";
+import { DateRangeDisplay } from "../DateRangeDisplay";
 
+// TODO: Generate with claude at 22:00
 interface VillaWithRating extends Villa {
   avgRating: number;
   userRatings?: { userId: string; username: string; rating: number }[];
@@ -82,11 +84,7 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
       <div>
         {villas.map((villa, index) => (
           <div key={villa.id}>
-            <div
-              className="villa-card"
-              onClick={() => onViewVilla(villa)}
-              style={{ cursor: "pointer" }}
-            >
+            <div className="villa-card">
               <div style={{ padding: "15px" }}>
                 <div
                   style={{
@@ -131,42 +129,78 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                     alignItems: "center",
                   }}
                 >
-                  <span
-                    style={{ color: "var(--primary-gold)", fontWeight: 600 }}
-                  >
-                    €{formatPrice(villa.price)}/week
-                  </span>
+                  {/* Date ranges and prices display */}
+                  <div style={{ marginRight: "20px", flex: 1 }}>
+                    <DateRangeDisplay
+                      dateRanges={villa.villa_date_ranges}
+                      compact={true}
+                    />
+                  </div>
                   {villa.userRatings && villa.userRatings.length > 0 && (
-                    <button
-                      onClick={(e) => toggleExpanded(villa.id, e)}
-                      style={{
-                        background: "rgba(212, 175, 55, 0.1)",
-                        border: "1px solid rgba(212, 175, 55, 0.3)",
-                        borderRadius: "8px",
-                        padding: "5px 12px",
-                        color: "var(--text-muted)",
-                        cursor: "pointer",
-                        fontSize: "14px",
-                        transition: "all 0.3s ease",
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background =
-                          "rgba(212, 175, 55, 0.2)";
-                        e.currentTarget.style.color = "var(--primary-gold)";
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background =
-                          "rgba(212, 175, 55, 0.1)";
-                        e.currentTarget.style.color = "var(--text-muted)";
-                      }}
-                    >
-                      <i
-                        className={`bi bi-chevron-${
-                          expandedVilla === villa.id ? "up" : "down"
-                        }`}
-                      ></i>{" "}
-                      Ratings ({villa.userRatings.length})
-                    </button>
+                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                      <button
+                        onClick={(e) => toggleExpanded(villa.id, e)}
+                        style={{
+                          background: "rgba(212, 175, 55, 0.1)",
+                          border: "1px solid rgba(212, 175, 55, 0.3)",
+                          borderRadius: "8px",
+                          padding: "5px 12px",
+                          color: "var(--text-muted)",
+                          cursor: "pointer",
+                          fontSize: "14px",
+                          transition: "all 0.3s ease",
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.background =
+                            "rgba(212, 175, 55, 0.2)";
+                          e.currentTarget.style.color = "var(--primary-gold)";
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background =
+                            "rgba(212, 175, 55, 0.1)";
+                          e.currentTarget.style.color = "var(--text-muted)";
+                        }}
+                      >
+                        <i
+                          className={`bi bi-chevron-${
+                            expandedVilla === villa.id ? "up" : "down"
+                          }`}
+                        ></i>{" "}
+                        Ratings ({villa.userRatings.length})
+                      </button>
+                      <button
+                        onClick={() => onViewVilla(villa)}
+                        style={{
+                          marginTop: "5px",
+                          background: "rgba(212, 175, 55, 0.1)",
+                          border: "1px solid rgba(212, 175, 55, 0.3)",
+                          borderRadius: "20px",
+                          padding: "8px 25px",
+                          color: "var(--primary-gold)",
+                          cursor: "pointer",
+                          fontSize: "14px",
+                          transition: "all 0.3s ease",
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: "5px",
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isRefreshing) {
+                            e.currentTarget.style.background =
+                              "rgba(212, 175, 55, 0.2)";
+                            e.currentTarget.style.transform =
+                              "translateY(-2px)";
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.background =
+                            "rgba(212, 175, 55, 0.1)";
+                          e.currentTarget.style.transform = "translateY(0)";
+                        }}
+                      >
+                        Details<i className="bi bi-arrow-right"></i>
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>

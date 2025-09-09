@@ -22,18 +22,26 @@ export interface GroupMember {
   joined_at: string;
 }
 
+export interface VillaDateRange {
+  id: string;
+  villa_id: string;
+  start_date: string;
+  end_date: string;
+  price_min: number;
+  price_max: number | null;
+  created_at: string;
+}
+
 export interface Villa {
   id: string;
   title: string;
   country: string;
   city: string;
-  address: string;
-  price: number;
-  start_date: string;
-  end_date: string;
+  address: string | null;
   images: string[];
-  additional_information: string;
+  additional_information: string | null;
   created_at: string;
+  villa_date_ranges?: VillaDateRange[];
 }
 
 export interface Rating {

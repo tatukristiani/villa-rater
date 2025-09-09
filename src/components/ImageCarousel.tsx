@@ -1,18 +1,20 @@
 // src/components/ImageCarousel.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
 
 interface ImageCarouselProps {
   images: string[];
   alt?: string;
   height?: string;
   borderRadius?: string;
+  onImageClick?: (img: string) => void;
 }
 
-export const ImageCarousel: React.FC<ImageCarouselProps> = ({ 
-  images, 
-  alt = 'Villa image',
-  height = '250px',
-  borderRadius = '15px'
+export const ImageCarousel: React.FC<ImageCarouselProps> = ({
+  images,
+  alt = "Villa image",
+  height = "250px",
+  borderRadius = "15px",
+  onImageClick,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
@@ -26,14 +28,14 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
   const handlePrevious = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentIndex(prev => (prev === 0 ? images.length - 1 : prev - 1));
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
     setTimeout(() => setIsTransitioning(false), 300);
   };
 
   const handleNext = () => {
     if (isTransitioning) return;
     setIsTransitioning(true);
-    setCurrentIndex(prev => (prev === images.length - 1 ? 0 : prev + 1));
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
     setTimeout(() => setIsTransitioning(false), 300);
   };
 
@@ -48,7 +50,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
 
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    
+
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
@@ -64,114 +66,116 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowLeft') {
+      if (e.key === "ArrowLeft") {
         handlePrevious();
-      } else if (e.key === 'ArrowRight') {
+      } else if (e.key === "ArrowRight") {
         handleNext();
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isTransitioning]);
 
   if (!images || images.length === 0) {
     return (
-      <div style={{
-        width: '100%',
-        height,
-        borderRadius,
-        background: 'rgba(255, 255, 255, 0.05)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'var(--text-muted)'
-      }}>
+      <div
+        style={{
+          width: "100%",
+          height,
+          borderRadius,
+          background: "rgba(255, 255, 255, 0.05)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "var(--text-muted)",
+        }}
+      >
         No images available
       </div>
     );
   }
 
   const carouselStyles: React.CSSProperties = {
-    position: 'relative',
-    width: '100%',
+    position: "relative",
+    width: "100%",
     height,
     borderRadius,
-    overflow: 'hidden',
-    background: 'rgba(0, 0, 0, 0.2)',
-    marginBottom: '20px'
+    overflow: "hidden",
+    background: "rgba(0, 0, 0, 0.2)",
+    marginBottom: "20px",
   };
 
   const imageContainerStyles: React.CSSProperties = {
-    display: 'flex',
-    transition: 'transform 0.3s ease-in-out',
+    display: "flex",
+    transition: "transform 0.3s ease-in-out",
     transform: `translateX(-${currentIndex * 100}%)`,
-    height: '100%'
+    height: "100%",
   };
 
   const imageStyles: React.CSSProperties = {
-    minWidth: '100%',
-    height: '100%',
-    objectFit: 'cover'
+    minWidth: "100%",
+    height: "100%",
+    objectFit: "cover",
   };
 
   const arrowButtonStyles: React.CSSProperties = {
-    position: 'absolute',
-    top: '50%',
-    transform: 'translateY(-50%)',
-    background: 'rgba(26, 26, 46, 0.8)',
-    backdropFilter: 'blur(10px)',
-    border: '1px solid rgba(212, 175, 55, 0.3)',
-    color: 'var(--primary-gold)',
-    width: '40px',
-    height: '40px',
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    cursor: 'pointer',
-    fontSize: '18px',
-    transition: 'all 0.3s ease',
-    zIndex: 2
+    position: "absolute",
+    top: "50%",
+    transform: "translateY(-50%)",
+    background: "rgba(26, 26, 46, 0.8)",
+    backdropFilter: "blur(10px)",
+    border: "1px solid rgba(212, 175, 55, 0.3)",
+    color: "var(--primary-gold)",
+    width: "40px",
+    height: "40px",
+    borderRadius: "50%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    fontSize: "18px",
+    transition: "all 0.3s ease",
+    zIndex: 2,
   };
 
   const indicatorContainerStyles: React.CSSProperties = {
-    position: 'absolute',
-    bottom: '15px',
-    left: '50%',
-    transform: 'translateX(-50%)',
-    display: 'flex',
-    gap: '8px',
-    zIndex: 2
+    position: "absolute",
+    bottom: "15px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    display: "flex",
+    gap: "8px",
+    zIndex: 2,
   };
 
   const indicatorStyles = (isActive: boolean): React.CSSProperties => ({
-    width: isActive ? '24px' : '8px',
-    height: '8px',
-    borderRadius: '4px',
-    background: isActive ? 'var(--primary-gold)' : 'rgba(255, 255, 255, 0.5)',
-    transition: 'all 0.3s ease',
-    cursor: 'pointer',
-    border: isActive ? '1px solid rgba(212, 175, 55, 0.3)' : 'none'
+    width: isActive ? "24px" : "8px",
+    height: "8px",
+    borderRadius: "4px",
+    background: isActive ? "var(--primary-gold)" : "rgba(255, 255, 255, 0.5)",
+    transition: "all 0.3s ease",
+    cursor: "pointer",
+    border: isActive ? "1px solid rgba(212, 175, 55, 0.3)" : "none",
   });
 
   const imageCounterStyles: React.CSSProperties = {
-    position: 'absolute',
-    top: '15px',
-    right: '15px',
-    background: 'rgba(26, 26, 46, 0.9)',
-    backdropFilter: 'blur(10px)',
-    padding: '5px 12px',
-    borderRadius: '20px',
-    border: '1px solid rgba(212, 175, 55, 0.2)',
-    color: 'var(--primary-gold)',
-    fontSize: '14px',
-    fontWeight: '500',
-    zIndex: 2
+    position: "absolute",
+    top: "15px",
+    right: "15px",
+    background: "rgba(26, 26, 46, 0.9)",
+    backdropFilter: "blur(10px)",
+    padding: "5px 12px",
+    borderRadius: "20px",
+    border: "1px solid rgba(212, 175, 55, 0.2)",
+    color: "var(--primary-gold)",
+    fontSize: "14px",
+    fontWeight: "500",
+    zIndex: 2,
   };
 
   return (
-    <div 
+    <div
       ref={carouselRef}
       style={carouselStyles}
       onTouchStart={onTouchStart}
@@ -186,7 +190,8 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
             src={image}
             alt={`${alt} ${index + 1}`}
             style={imageStyles}
-            loading={index === 0 ? 'eager' : 'lazy'}
+            loading={index === 0 ? "eager" : "lazy"}
+            onClick={() => onImageClick && onImageClick(image)}
           />
         ))}
       </div>
@@ -199,15 +204,15 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
             onClick={handlePrevious}
             style={{
               ...arrowButtonStyles,
-              left: '15px'
+              left: "15px",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(212, 175, 55, 0.2)';
-              e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+              e.currentTarget.style.background = "rgba(212, 175, 55, 0.2)";
+              e.currentTarget.style.transform = "translateY(-50%) scale(1.1)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(26, 26, 46, 0.8)';
-              e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+              e.currentTarget.style.background = "rgba(26, 26, 46, 0.8)";
+              e.currentTarget.style.transform = "translateY(-50%) scale(1)";
             }}
             aria-label="Previous image"
           >
@@ -219,15 +224,15 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
             onClick={handleNext}
             style={{
               ...arrowButtonStyles,
-              right: '15px'
+              right: "15px",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(212, 175, 55, 0.2)';
-              e.currentTarget.style.transform = 'translateY(-50%) scale(1.1)';
+              e.currentTarget.style.background = "rgba(212, 175, 55, 0.2)";
+              e.currentTarget.style.transform = "translateY(-50%) scale(1.1)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(26, 26, 46, 0.8)';
-              e.currentTarget.style.transform = 'translateY(-50%) scale(1)';
+              e.currentTarget.style.background = "rgba(26, 26, 46, 0.8)";
+              e.currentTarget.style.transform = "translateY(-50%) scale(1)";
             }}
             aria-label="Next image"
           >
