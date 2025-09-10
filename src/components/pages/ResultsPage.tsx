@@ -3,7 +3,6 @@ import { Villa } from "../../types/types";
 import { getInitials } from "../../utils/helpers";
 import { DateRangeDisplay } from "../DateRangeDisplay";
 
-// TODO: Generate with claude at 22:00
 interface VillaWithRating extends Villa {
   avgRating: number;
   userRatings?: { userId: string; username: string; rating: number }[];
@@ -137,7 +136,13 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({
                     />
                   </div>
                   {villa.userRatings && villa.userRatings.length > 0 && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                      }}
+                    >
                       <button
                         onClick={(e) => toggleExpanded(villa.id, e)}
                         style={{

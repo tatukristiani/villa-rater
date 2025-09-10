@@ -7,6 +7,7 @@ interface ImageCarouselProps {
   height?: string;
   borderRadius?: string;
   onImageClick?: (img: string) => void;
+  resetKey?: string | number;
 }
 
 export const ImageCarousel: React.FC<ImageCarouselProps> = ({
@@ -15,12 +16,17 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
   height = "250px",
   borderRadius = "15px",
   onImageClick,
+  resetKey,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [resetKey]);
 
   // Minimum swipe distance (in px)
   const minSwipeDistance = 50;

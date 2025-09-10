@@ -436,6 +436,7 @@ function App() {
               onSaveRating={handleSaveRating}
               onNext={handleNextVilla}
               hasRated={state.hasRatedCurrent}
+              resetKey={state.villas[state.currentVillaIndex].id}
             />
           )}
         {state.currentPage === "waiting" &&
@@ -462,6 +463,7 @@ function App() {
             villa={state.selectedVilla}
             userRating={state.ratings[state.selectedVilla.id]}
             onBack={() => navigate("results")}
+            resetKey={state.villas[state.currentVillaIndex].id}
           />
         )}
       </div>
