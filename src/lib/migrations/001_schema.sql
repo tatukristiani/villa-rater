@@ -36,6 +36,7 @@ create table if not exists public.villas (
   country text not null,
   city text not null,
   address text,
+  link text not null,
   images text[] default array[]::text[],
   additional_information text,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null

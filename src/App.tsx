@@ -466,11 +466,11 @@ function App() {
             resetKey={state.villas[state.currentVillaIndex].id}
           />
         )}
+        <Toast
+          {...toast}
+          onClose={() => setToast((prev) => ({ ...prev, show: false }))}
+        />
       </div>
-      <Toast
-        {...toast}
-        onClose={() => setToast((prev) => ({ ...prev, show: false }))}
-      />
     </>
   );
 }

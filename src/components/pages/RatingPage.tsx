@@ -370,17 +370,27 @@ export const RatingPage: React.FC<RatingPageProps> = ({
           <h3 style={{ color: "var(--primary-gold)" }}>
             Villa {currentIndex + 1} of {totalVillas}
           </h3>
-          <span
+
+          <div
             style={{
-              background: "rgba(212, 175, 55, 0.2)",
-              color: "var(--primary-gold)",
-              padding: "5px 10px",
-              borderRadius: "10px",
-              fontSize: "14px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "12px",
             }}
           >
-            <i className="bi bi-geo-alt"></i> {villa.city}, {villa.country}
-          </span>
+            <span
+              style={{
+                background: "rgba(212, 175, 55, 0.2)",
+                color: "var(--primary-gold)",
+                padding: "5px 10px",
+                borderRadius: "10px",
+                fontSize: "14px",
+              }}
+            >
+              <i className="bi bi-geo-alt"></i> {villa.city}, {villa.country}
+            </span>
+          </div>
         </div>
 
         {/* Image carousel */}
@@ -391,10 +401,38 @@ export const RatingPage: React.FC<RatingPageProps> = ({
           onImageClick={openEnlargedImage}
           resetKey={resetKey}
         />
-
-        <h2 style={{ color: "var(--text-light)", margin: "15px 0" }}>
-          {villa.title}
-        </h2>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            gap: "12px",
+          }}
+        >
+          <h2 style={{ color: "var(--text-light)", margin: "15px 0" }}>
+            {villa.title}
+          </h2>
+          <a
+            href={villa.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              background: "var(--primary-gold)",
+              color: "#fff",
+              padding: "5px 12px",
+              borderRadius: "8px",
+              fontSize: "13px",
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              fontWeight: 500,
+            }}
+          >
+            <i className="bi bi-link-45deg"></i> View Website
+          </a>
+        </div>
 
         {/* Date ranges and prices display */}
         <div style={{ marginBottom: "20px" }}>

@@ -38,6 +38,7 @@ export interface Villa {
   country: string;
   city: string;
   address: string | null;
+  link: string;
   images: string[];
   additional_information: string | null;
   created_at: string;
