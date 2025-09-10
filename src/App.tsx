@@ -262,6 +262,7 @@ function App() {
       hasRatedCurrent: true,
     }));
     showToast("Rating Saved", `You rated this villa ${rating} stars`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleNextVilla = () => {
