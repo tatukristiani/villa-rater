@@ -450,9 +450,30 @@ export const VillaViewPage: React.FC<VillaViewPageProps> = ({
         {/* Additional Information */}
         {villa.additional_information && (
           <div style={{ marginBottom: "20px" }}>
-            <h4 style={{ color: "var(--primary-gold)", marginBottom: "15px" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "10px" }}>
+            <h4 style={{ color: "var(--primary-gold)"}}>
               <i className="bi bi-info-circle"></i> Amenities & Features
             </h4>
+             <a
+            href={villa.link}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              background: "var(--primary-gold)",
+              color: "#fff",
+              padding: "5px 12px",
+              borderRadius: "8px",
+              fontSize: "13px",
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              fontWeight: 500,
+            }}
+          >
+            <i className="bi bi-link-45deg"></i> View Website
+          </a>
+          </div>
             <div
               style={{
                 background: "rgba(255, 255, 255, 0.03)",
